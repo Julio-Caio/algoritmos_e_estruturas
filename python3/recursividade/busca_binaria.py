@@ -21,10 +21,10 @@ def binarySearch(array: list, item: int, index_low: int, index_high: int) -> int
     if index_low > index_high:
         return -1
 
-    # Calcula o índice do meio
+    # Calculamos o índice do meio
     index_middle = (index_low + index_high) // 2
 
-    # Verifica se o item do meio é o item buscado
+    # Verificamos se o item do meio é o item buscado
     if array[index_middle] == item:
         return index_middle
     # Se o item do meio é maior, busca na metade esquerda

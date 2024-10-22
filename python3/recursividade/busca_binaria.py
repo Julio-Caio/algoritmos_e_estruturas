@@ -37,7 +37,7 @@ def binarySearch(array: list, item: int, index_low: int, index_high: int) -> int
 
 if __name__ == '__main__':
     arr = [2, 3, 4, 10, 12, 24, 26, 40, 65, 88]
-    item = 10
+    item = 26
     
     result = binarySearch(arr, item, 0, len(arr)-1)
     

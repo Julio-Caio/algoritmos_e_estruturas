@@ -1,5 +1,11 @@
 # Autor: Julio Caio Rodrigues
 
+# Data: 26/10/2024
+
+"""
+Implementação da estrutura de dados Fila
+"""
+
 class QueueException(Exception):
     """
     Uma classe que permite enviar mensagens quando exceções são identificadas na execução daquele código
@@ -14,7 +20,6 @@ class Node:
     Atributos:
     carga: O valor armazenado dentro do nó.
     next: Referencia o próximo nó na fila.
-
     """
 
     def __init__(self, carga):
@@ -22,21 +27,16 @@ class Node:
         self.__next = None
     
     def get_item(self):
-        """
-        Retorna o nó atual
-        """
+        """Retorna o valor armazenado no nó."""
+
         return self.__carga
 
-    def get_next(self):
-        """
-        Retorna o nó seguinte ao atual
-        """
+    @property
+    def next(self):
         return self.__next
 
-    def set_next(self, next_node):
-        """
-        Atribue um novo valor ao próximo nó
-        """
+    @next.setter
+    def next(self, next_node):
         self.__next = next_node
 
 class Queue:
@@ -53,90 +53,100 @@ class Queue:
         atual = self.__frente
         while atual:
             elements += str(atual.get_item())
-
-            if atual.get_next() is not None:
+            atual = atual.next  # Usando o atributo next diretamente
+            if atual is not None:
                 elements += "-> "
-            atual = atual.get_next()
         return "(Front) -> " + elements if elements else "Empty Queue"
 
     def is_empty(self):
-        """
-        Verifica se a fila está vazia
-        """
+        """Verifica se a fila está vazia."""
+
         return self.__tamanho == 0
 
     @property
-    def size(self):
-        """
-        Devolve o tamanho atual da fila (quantidade de elementos)
-        """
+    def tamanho(self):
+        """Devolve o tamanho atual da fila (quantidade de elementos)."""
+
         return self.__tamanho
     
-    def enqueue(self, carga):
-        """
-        Adiciona um novo nó ao final da fila.
+    def enqueue(self, elemento):
+        """Adiciona um novo nó ao final da fila."""
 
-        Parâmetros:
-        carga: O valor a ser armazenado no novo nó.
+        if elemento is None:
+            raise QueueException("Não é permitido inserir um valor None na fila.")
 
-        Se a fila estiver vazia, o novo nó se torna o primeiro e o último elemento.
-        Caso contrário, o novo nó é adicionado ao final da fila.
-        """
-        newNode = Node(carga)
+        new_node = Node(elemento)
 
         if self.is_empty():
-            self.__frente = newNode
-            self.__fundo = newNode
+            self.__frente = new_node
+            self.__fundo = new_node
         else:
-        # se não, o atributo next presente no último elemento, começa a apontar para este novo
-        # após isso, o atributo do útlimo elemento atualiza para o novo valor inserido no final da fila
-            self.__fundo.set_next(newNode)
-            self.__fundo = newNode
+            self.__fundo.next = new_node
+            self.__fundo = new_node
 
-        # após incrementar um novo elemento na fila, atualize o tamanho
         self.__tamanho += 1
     
     def dequeue(self):
-        # se a fila estiver vazia, retorne a Exception que definimos
+        """Remove e retorna o primeiro elemento da fila."""
         if self.is_empty():
             raise QueueException(self._get_empty_queue_msg())
         
-        # se não, capture o valor do primeiro elemento
         node_removed = self.__frente.get_item()
-        # o elemento da frente é agora o valor que vinha logo após a ele na fila anterior
-        self.__frente = self.__frente.get_next()
-        # decremente o tamanho da fila
+        self.__frente = self.__frente.next
         self.__tamanho -= 1
 
         return node_removed
+    
+    def peek(self):
+        """Devolve o primeiro elemento sem removê-lo."""
+        if self.is_empty():
+            raise QueueException(self._get_empty_queue_msg())
+        return self.__frente.get_item()
+    
+    def clear(self):
+        """Esvazia a fila liberando cada um dos nós."""
+        while self.__frente is not None:
+            tmp = self.__frente
+            self.__frente = self.__frente.next
+        
+        self.__fundo = None
+        self.__tamanho = 0
 
     def _get_empty_queue_msg(self):
-        return "Queue is Empty! Please enqueue an item before dequeuing."
+        return "Queue is Empty! Please enqueue an item before dequeuing.\n"
 
     def print_queue(self):
         if self.is_empty():
-            print("Queue is Empty! Nothing to show...")
+            print(self._get_empty_queue_msg())
         else:
             print(f"Queue: {self.__str__()}")
 
 if __name__ == "__main__":
     queue = Queue()
-
+    
+    # Tentar remover um elemento de uma fila vazia
     try:
         queue.dequeue()
     except QueueException as e:
-        print(f"Error: {e}")
+        print(f"\nError: {e}\n")
 
+    print("Adicionando elementos (1-8)...\n")
     for i in range(1, 9):
         queue.enqueue(i)
     
-    print(f"Current Queue Size: {queue.size}")
+    print(f"Current Queue Size: {queue.tamanho}\n")
     queue.print_queue()
 
-    for i in range(5):
+    # Desenfileirar 5 elementos
+    for _ in range(5):
         try:
             queue.dequeue()
         except QueueException as e:
             print(f"Error: {e}")
 
+    queue.print_queue()
+
+    print("\nLimpando a fila...")
+    queue.clear()
+    print()
     queue.print_queue()
